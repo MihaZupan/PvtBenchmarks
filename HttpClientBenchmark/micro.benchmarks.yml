@@ -1,0 +1,30 @@
+﻿jobs:
+  benchmarks:
+    source:
+      localFolder: .
+      project: HttpClientBenchmark.csproj
+    variables:
+      filterArg: "*"
+      jobArg: medium
+    arguments:  --job {{jobArg}} --filter {{filterArg}} --memory
+    options:
+      benchmarkDotNet: true
+    
+scenarios:
+  all:
+    application:
+      job: benchmarks
+
+profiles:
+  perf:
+    jobs: 
+      application:
+        endpoints: 
+          - http://asp-perf-db:5001
+  mizupan:
+    jobs: 
+      application:
+        endpoints: 
+          - http://mizupan-office:5010
+        environmentVariables:
+          machine: mizupan

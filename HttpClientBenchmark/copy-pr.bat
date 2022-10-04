@@ -1,0 +1,1 @@
+copy C:\MihaZupan\runtime\artifacts\bin\System.Net.Http\Release\net7.0-windows\* ..\pr

@@ -1,0 +1,1 @@
+dotnet run -c Release --job long --corerun ..\main\corerun.exe ..\pr\corerun.exe
