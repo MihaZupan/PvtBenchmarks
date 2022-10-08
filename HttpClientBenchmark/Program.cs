@@ -657,19 +657,18 @@ public class IndexOfAnyBenchmarks
     private string _textExcept = null!;
     private string _needle = null!;
 
-    [Params(1, 8, 16, 32, 64, 128, 10000)]
+    //[Params(1, 8, 16, 32, 64, 128, 10000)]
+    //[Params(1, 8, 16, 10000)]
+    [Params(1000)]
     public int Length = 1;
 
-    [Params("ABCDEF", "AlphaNumeric", "ValidUriChars")]
-    //[Params("ABCDEF")]
+    //[Params("ABCDEF", "AlphaNumeric", "ValidUriChars")]
+    [Params("ABCDEF", "AlphaNumeric")]
     public string? Needle = "ABCDEF";
 
     [GlobalSetup]
     public void Setup()
     {
-        _text = new string('\n', Length);
-        _textExcept = new string('a', Length);
-
         const string AlphaNumeric = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
 
         _needle = Needle switch
@@ -679,20 +678,26 @@ public class IndexOfAnyBenchmarks
             // Similar thing in YARP: https://github.com/microsoft/reverse-proxy/blob/5a86eb4f18474bbe2f9e73f8457f4cbf13c00b81/src/ReverseProxy/Forwarder/RequestUtilities.cs#L212-L228
             "ValidUriChars" => AlphaNumeric + "-._~" + ":/?#[]@" + "!$&'()*+,;=",
             "NeedleWithZero" => "abcde" + '\0',
+            "LongNonAscii" => "ű" + AlphaNumeric,
+            "LongNonAsciiAfter" => AlphaNumeric + "ű",
             _ => throw new Exception(Needle)
         };
+
+        var rng = new Random(42);
+        _text = new string('\n', Length);
+        _textExcept = string.Concat(Enumerable.Range(0, Length).Select(_ => _needle[rng.Next(_needle.Length)]));
     }
 
     [Benchmark]
     public int IndexOfAny() => _text.AsSpan().IndexOfAny(_needle);
 
-    //[Benchmark]
+    [Benchmark]
     public int IndexOfAnyExcept() => _textExcept.AsSpan().IndexOfAnyExcept(_needle);
 
-    //[Benchmark]
+    [Benchmark]
     public int LastIndexOfAny() => _text.AsSpan().LastIndexOfAny(_needle);
 
-    //[Benchmark]
+    [Benchmark]
     public int LastIndexOfAnyExcept() => _textExcept.AsSpan().LastIndexOfAnyExcept(_needle);
 
     //[Benchmark]
